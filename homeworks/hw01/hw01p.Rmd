@@ -14,15 +14,17 @@ To "hand in" the homework, you should compile or publish this file into a PDF th
 ## R Basics
 
 First, install the package `testthat` (a widely accepted testing suite for R) from https://github.com/r-lib/testthat using `pacman`. If you are using Windows, this will be a long install, but you have to go through it for some of the stuff we are doing in class. LINUX (or MAC) is preferred for coding. If you can't get it to work, install this package from CRAN (still using `pacman`), but this is not recommended long term.
-
+p
 ```{r}
 #TO-DO
+library('testthat')
 ```
 
 1. Use the `seq` function to create vector `v` consisting of all numbers from -100 to 100. 
 
 ```{r}
 #TO-DO
+v <- seq(201)-101
 ```
 
 Test using the following code:
@@ -37,6 +39,9 @@ If there are any errors, the `expect_equal` function will tell you about them. I
 
 ```{r}
 #TO-DO
+my_reverse = function (v) {
+  v[length(v):1]
+}
 ```
 
 Test using the following code:
@@ -50,6 +55,16 @@ expect_equal(my_reverse(v), rev(v))
 
 ```{r}
 n = 50
+sample_space = c(0,1,2)
+dist = c(0.5, 0.25, 0.25)
+random_matrix = rep(sample_space, (n^2)*dist)
+
+shuffled_random_matrix = sample(random_matrix, length(random_matrix), replace=FALSE)
+shuffled_random_matrix
+table(shuffled_random_matrix)
+
+R = matrix(shuffled_random_matrix, nrow = n, ncol = n)
+R
 #TO-DO
 ```
 
