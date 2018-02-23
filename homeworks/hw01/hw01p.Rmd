@@ -72,8 +72,16 @@ Test using the following and write two more tests as specified below:
 
 ```{r}
 expect_equal(dim(R), c(n, n))
+
 #TO-DO test that the only unique values are 0, 1, 2
+unique.values = function(mat) {
+  as.numeric( dimnames(table(R))[[1]])
+}
+expect_equal(sort(unique.values(R)), sort(c(2,1,0)))
+
 #TO-DO test that there are exactly 625 2's
+expect_equal(table(R)["2"][[1]], 625)
+
 ```
 
 4. Randomly punch holes (i.e. `NA`) values in this matrix so that approximately 30% of the entries are missing.
