@@ -1,7 +1,7 @@
 ---
 title: "HW01p"
-author: "Your Name Here"
-date: "February x, 2018"
+author: "Angel Montero"
+date: "February 24, 2018"
 output: pdf_document
 ---
 
@@ -59,7 +59,7 @@ sample_space = c(0,1,2)
 dist = c(0.5, 0.25, 0.25)
 random_matrix = rep(sample_space, (n^2)*dist)
 
-shuffled_random_matrix = sample(random_matrix, length(random_matrix), replace=FALSE)
+shuffled_random_matrix = sample(random_matrix)
 shuffled_random_matrix
 table(shuffled_random_matrix)
 
@@ -87,6 +87,10 @@ expect_equal(table(R)["2"][[1]], 625)
 4. Randomly punch holes (i.e. `NA`) values in this matrix so that approximately 30% of the entries are missing.
 
 ```{r}
+# let p (success) the probability that a location in the matrix will have a hole
+holes = rbinom(length(R), size = 1, prob = 0.3)
+R[(holes==1)]=NA
+
 #TO-DO
 ```
 
@@ -102,6 +106,11 @@ expect_gt(num_missing_in_R, qbinom(0.005, n^2, 0.3))
 
 ```{r}
 #TO-DO
+R_row_sums = rowSums(R,na.rm=TRUE)
+ordered_sums = order(R_row_sums)
+reversed = my_reverse(ordered_sums)
+
+R = R[reversed,]
 ```
 
 Test using the following code.
@@ -117,6 +126,7 @@ for (i in 2 : n){
 6. Create a vector `v` consisting of a sample of 1,000 iid normal realizations with mean -10 and variance 10.
 
 ```{r}
+v = rnorm(1000, mean = -10, sd = sqrt(10))
 #TO-DO
 ```
 
@@ -124,7 +134,12 @@ for (i in 2 : n){
 Find the average of `v` and the standard error of `v`.
 
 ```{r}
-#TO-DO
+# STD error function
+se = function(x) {
+  sd(x)/sqrt(length(x))
+}
+mean(v) #mean
+se(v)
 ```
 
 Find the 5%ile of `v` and use the `qnorm` function as part of a test to ensure it is correct based on probability theory.
@@ -132,6 +147,10 @@ Find the 5%ile of `v` and use the `qnorm` function as part of a test to ensure i
 ```{r}
 #TO-DO
 #expect_equal(..., tol = )
+
+quantile(v, probs=0.05) # 5%ile
+
+
 ```
 
 Find the sample quantile corresponding to the value -7000 of `v` and use the `pnorm` function as part of a test to ensure it is correct based on probability theory.
