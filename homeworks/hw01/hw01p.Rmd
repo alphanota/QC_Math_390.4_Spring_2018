@@ -148,9 +148,11 @@ Find the 5%ile of `v` and use the `qnorm` function as part of a test to ensure i
 #TO-DO
 #expect_equal(..., tol = )
 
-quantile(v, probs=0.05) # 5%ile
+sample_quant = qnorm(0.05,mean(v),sd(v)) #  The 5%ile of the sample
 
+percent_below_quant = length ( v[ (v < sample_quant)] ) / length(v) # the calculated % of the observations are below 5% percentile
 
+expect_equal(percent_below_quant, 0.05, tolerance=0.005)
 ```
 
 Find the sample quantile corresponding to the value -7000 of `v` and use the `pnorm` function as part of a test to ensure it is correct based on probability theory.
@@ -159,6 +161,10 @@ Find the sample quantile corresponding to the value -7000 of `v` and use the `pn
 ```{r}
 #TO-DO
 #expect_equal(..., tol = )
+
+inverse_quantile_obj = ecdf(v)
+
+inv=inverse_quantile_obj(-7000)
 ```
 
 
@@ -167,6 +173,20 @@ Find the sample quantile corresponding to the value -7000 of `v` and use the `pn
 
 ```{r}
 #TO-DO
+
+keys = c("A","B","C","D","E","F","G","H")
+
+expect_equal(length(keys), 8) #sanity check
+
+matrixify = function(n) {
+  x = c(1:n^n)
+  dim(x) = rep(n,n)
+  x
+}
+
+my_list = lapply(1:8, matrixify)
+names(my_list) = keys
+
 ```
 
 Test with the following uncomprehensive tests:
@@ -191,7 +211,7 @@ Answer here in English.
 Now cleanup the namespace by deleting all stored objects and functions:
 
 ```{r}
-#TO-DO
+rm(list=ls())
 ```
 
 ## Basic Binary Classification Modeling
@@ -199,25 +219,47 @@ Now cleanup the namespace by deleting all stored objects and functions:
 8. Load the famous `iris` data frame into the namespace. Provide a summary of the columns and write a few descriptive sentences about the distributions using the code below and in English.
 
 ```{r}
-#TO-DO
+summary(iris)
 ```
+The iris dataset has four attributes and 1 outcome column. The attributes measure the width and length of the sepal and petals, which are parts of the flower. The outcome is the species of the flower. There are three species of flowers: _iris setosa_, _versicolor,_ and _virginica_.
+The length of the sepals ranges from 4.3 to 7.9 cm and the sepal widths from 2.0 to 4.4 cm.
+
 
 The outcome metric is `Species`. This is what we will be trying to predict. However, we have only done binary classification in class (i.e. two classes). Thus the first order of business is to drop one class. Let's drop the level "virginica" from the data frame.
 
 ```{r}
 #TO-DO
+iris = iris[!(iris$Species == 'virginica'),]
 ```
 
 Now create a vector `y` that is length the number of remaining rows in the data frame whose entries are 0 if "setosa" and 1 if "versicolor".
 
 ```{r}
 #TO-DO
+y = as.numeric(iris$Species == "versicolor")
 ```
 
 9. Fit a threshold model to `y` using the feature `Sepal.Length`. Try to write your own code to do this. What is the estimated value of the threshold parameter? What is the total number of errors this model makes?
 
 ```{r}
 #TO-DO
+
+# We can look at the sepal length distribution of setosa, and versicolor. And see if they are far apart
+
+sepal = iris[ (iris$Species == "setosa"),]$Sepal.Length
+
+mean(sepal)
+sd(sepal)
+
+#one way would be to pick as treshold the sepal length under which 95% of the setosas fall
+treshold = qnorm(0.95, mean(sepal),sd(sepal))
+
+                     # what we call                         # what it actually is
+num_errors = sum( (iris$Sepal.Length < treshold) != (iris$Species == "setosa")  )
+
+# our error rate
+error_rate = num_errors/length(iris$Species)
+
 ```
 
 Does this make sense given the following summaries:
@@ -227,7 +269,7 @@ summary(iris[iris$Species == "setosa", "Sepal.Length"])
 summary(iris[iris$Species == "virginica", "Sepal.Length"])
 ```
 
-Write your answer here in English.
+I think it does make sense, if we plot the distribution of the sepal length by species, the mean  and distributions of sepal length for setosa and versicolor are separated. We can take advantage of that separation by calling anything below a given sepal length "setosa" and anything above versicolor.
 
 10. Fit a perceptron model explaining `y` using all three features. Try to write your own code to do this. Provide the estimated parameters (i.e. the four entries of the weight vector)? What is the total number of errors this model makes?
 
@@ -236,10 +278,39 @@ Write your answer here in English.
 ```
 
 
+```{r}
+
+#attrs1 = cbind(1,iris[c(1,2,3,4)])
+attrs1 = as.matrix(cbind(1, iris[, c(1,2,3,4), drop = FALSE]))
 
 
+y_binary = as.numeric(iris$Species == "setosa")
+
+#y_binary = ifelse(y_binary == 1, 0, 1)
+
+MAX_ITER = 1000
+w_vec = rep(0, 5) #intialize a 2-dim vector
+
+for (iter in 1 : MAX_ITER){  
+  for (i in 1 : nrow(attrs1)){
+    x_i = attrs1[i, ]
+    yhat_i = ifelse(sum(x_i * w_vec) > 0, 1, 0)
+    y_i = y_binary[i]
+    w_vec = w_vec + (y_i - yhat_i) * x_i
+  }
+}
+w_vec
+```
 
 
+What is our error rate?
 
+```{r}
 
+yhat = ifelse(attrs1 %*% w_vec > 0, 1, 0)
+
+sum(y_binary != yhat) / length(y_binary)
+```
+
+The error rate is 0. This is probably not a good sign, because it means we are overfitting the data.
 
