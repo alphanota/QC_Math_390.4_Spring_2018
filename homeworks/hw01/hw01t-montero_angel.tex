@@ -9,7 +9,7 @@
 
 \title{MATH 390.4 / 650.2 Spring 2018 Homework \#1t}
 
-\author{Professor Adam Kapelner} %STUDENTS: write your name here
+\author{Angel Montero} %STUDENTS: write your name here
 
 \iftoggle{professormode}{
 \date{Due \emph{in class} Monday, February 26, 2018 \\ \vspace{0.5cm} \small (this document last updated \today ~at \currenttime)}
@@ -78,14 +78,24 @@ NAME: \line(1,0){380}
 
 \easysubproblem{Pursuant to the fix in the previous question, how do we define \emph{data} for the purposes of this class?}\spc{3}
 
+Data is the result of measuring a property of the objective reality. It is information that comes from the real world, not the constructs we create. It is the reality.
 
 \easysubproblem{Pursuant to the fix in the previous question, how do we define \emph{predictions} for the purposes of this class?}\spc{3}
 
+Predictions are the results of the models we create. In contrast to data, predictions are man-made and are supposed to approximate 
+reality, but is not reality itself.
+
 \easysubproblem{Why are \qu{all models wrong}? We are quoting the famous statisticians George Box and Norman Draper here.}\spc{2}
+
+The idea is that there is only one objective truth, the world follows only one set of possible rules. This objective truth and all all its rules are so complex that we can never hope to describe it exactly. There can be an infinite set of models that closely approximate the truth, but only one actual truth. A simple way to put it would be that if a model was right, it would cease to be a model and would just be reality itself, which is why all models have to be wrong. 
 
 \intermediatesubproblem{Why are \qu{[some models] useful}? We are quoting the famous statisticians George Box and Norman Draper here.}\spc{2}
 
+Some models can do a good job of closely representing reality. We can use the rules of this model to find explanations about real world phenoma or make predictions that fall close to real outcomes.
+
 \easysubproblem{What is the difference between a "good model" and a "bad model"?}\spc{2}
+
+A model is considered good if the predictions it produces closely follow actualy reality. If it doesn't it's considered a poor model.
 
 \end{enumerate}
 
@@ -95,56 +105,151 @@ NAME: \line(1,0){380}
 
 \intermediatesubproblem{How good / bad do you think this model is and why?}\spc{3}
 
+
+If we define a model to be good if predictions are close to reality, this model would be a good fit if a person who eats an apple on a day does not see a doctor on that day. I think this would be a good model on this criteria alone, because a person on any given day is more likely to eat an apple than they are to see a doctor (unless they are really ill) So the days where an apple is eaten and there are no doctor visits would outnumber the days where an apple is eaten and there has been a doctor visit. The converse, if a person does not eat an apple every day, then they will see a doctor, is tricker because the adage does not make any specific claims about it. However let's assume it is true, and lets make the model more specific. If a person eats an apple or more a day, they will not see a doctor, otherwise, if a person eats less than one apple day, they will see a doctor on that day. This more specific definition has a poorer fit because we are predicting that one the days that the person does not eat an apple or more a day, they will see a doctor, which I don't think is an accurate presentation of reality.
+
+Another issue with the model is that it claims that eating apples alone is the only causal input, or alone is the input that predicits wethere a person will see the other. There many other factors, such as previous illnesses, family history, traumatic injuries... etc.. that will determine if you see a doctor or not.
+
 \easysubproblem{Is this a mathematical model? Yes / no and why.}\spc{3}
+
+This is not a mathematical model. By definition, a mathematical model has numerical inputs and this statement does not. We can however attempt to transform the statement into a mathematical model in the following questions.
 
 \easysubproblem{What is(are) the input(s) in this model?}\spc{3}
 
+The apples that the person eats in a given day.
+
 \easysubproblem{What is(are) the output(s) in this model?}\spc{3}
 
+Wether the person saw a doctor that day.
 
 \easysubproblem{Devise a means to measure the main input. Call this $x_1$ going forward.}\spc{4}
 
+Apples vary in their size and weight, in order to compare the data it might be best to 
+measure the weight of apples (in grams) eaten per day, which will be more comparable from person
+to person regardless of how many individual apples they eat.
+
+Let $x$ be the mass weight (in grams) of apple eaton a day.
+
 \easysubproblem{Devise a means to measure the main output. Call this $y$ going forward.}\spc{4}
+
+let the output, $y$ be $1$ if the person did \emph{not} see a doctor that day. If the person did see a doctor that day, then $y = 0$ 
+
 
 \easysubproblem{What is $\mathcal{Y}$ mathematically?}\spc{3}
 
+$y=g(x_1)$
+
 \easysubproblem{Briefly describe $z_1, \ldots, z_t$ in English where $y = t(z_1, \ldots, z_t)$ in this \emph{phenomenon} (not \emph{model}).}\spc{3}
+
+$y = t(z_1, \ldots, z_t)$ represents the objective reality. It is the true description of the world.
+
+$z_1, \ldots, z_t$ are the inputs that completely describe/ control $y$. The causal inputs, of which $x_1$ may or may not belong.
+
 
 \easysubproblem{From this point on, you only observe $x_1$ is in the model. What is $p$ mathematically?}\spc{1}
 
+$p = dim([x_1]) = 1$
+
+Our model consists of a single predictive feature, $x_1$
 
 \intermediatesubproblem{From this point on, you only observe $x_1$ is in the model. What is $\mathcal{X}$ mathematically? If your information contained in $x_1$ is non-numeric, you must coerce it to be numeric at this point.}\spc{3}
 
+If $x_1$ is the gram weight of apples eaten a day, then $x_1\in\mathbb{R}$
+
+and $\mathcal{X} = [x_1]$
 \intermediatesubproblem{How did we term the functional relationship between $y$ and $x_1$?}\spc{3}
 
+There is a function, $f$, that given $x_1$, most closely approximates $y$.\\
+$y \approx f(x_1)$. \\
+$f(x_1)$ will never \emph{equal} $y$ but it will approximate it.
 
 \easysubproblem{Briefly describe \emph{superivised learning}.}\spc{5}
 
+Supervised learning uses prior data (from the real world) in order to find a model that can best approximate or predict $y$.
+
 \easysubproblem{Why is \emph{superivised learning} a \emph{empirical solution} and not an \emph{analytic solution}?}\spc{3}
+
+Supervised learning uses empirical numerical data from the past to make a model that produces an empirical solution. An analytical solution is an exact relationship with variables, functions, which cannot be derived from numerical data. 
 
 \intermediatesubproblem{From this point on, assume we are involved in supervised learning to achieve the goal you stated in the previous question. Briefly describe what $\mathbb{D}$ would look like here.}\spc{3}
 
+$\mathbb{D}$ is the training data obtained from real world measurements.
+
+$\mathbb{D} := { <\vec{X_1}, \vec{Y_1}>, \ldots, <\vec{X_n}, \vec{Y_n} } >  $
+
+where $\vec{X_i} = [x_1] $ and $\vec{Y_i} = [y] $
 \intermediatesubproblem{Briefly describe the role of $\mathcal{H}, \mathcal{A}$ here.}\spc{3}
+
+In supervised learning:\\
+$\mathcal{H} = \text{ The set of all candidate functions}$\\
+$\mathcal{A} = \text{ The algorithm that picks the best candidate function in } \mathcal{H} $
+
 
 \easysubproblem{If $g = \mathcal{A}(\mathbb{D}, \mathcal{H})$, what should the domain and range of $g$ be?}\spc{3}
 
+For $\mathbb{D}$:\\
+$x_1 \in \mathbb{R+}; y \in {0,1}$\\
+
+$g$ has as its only argument $x_1$ and its output is $y$.
+So the domain of $g$ is $\mathbb{R+}$ and its range ${0,1}$
+
 \easysubproblem{Is $g \in \mathcal{H}$? Why or why not?}\spc{3}
+
+Yes. $g$ is by definition the best possible approximation to f in $\mathcal{H}$, where $f$ is the best possible function given available data.
 
 \easysubproblem{Given a never-before-seen value of $x_1$ which we denote $x^*$, what formula would we use to predict the corresponding value of the output? Denote this prediction $\hat{y}^*$.}\spc{3}
 
+$\hat{y}^* = g(\hat{x}^*)$
+
 \intermediatesubproblem{Is it reasonable to assume $f \in \mathcal{H}$? Why or why not?}\spc{4}
+
+It is usually not reasonable. $f$ is the function that best predicts $y$ when you only have the feature $x_1$ available. A very many $x_1$ is needed to find the best $f$ but out training data almost always is limited in size, so we would never be able to find $f$ with the training data we have.
 
 \easysubproblem{If $f \notin \mathcal{H}$, what are the three sources of error? Write their names and provide a sentence explanation of each. Note that I made a notational mistake in the notes based on what is canonical in data science. The difference $t - g$ should be termed $e$ as the term $\mathcal{E}$ is reserved for $t - h^*$.}\spc{4}
 
+When the best function $f$ that can explain $y$ with $x$ is NOT in the set of candidate functions, there are three sources of error.
+
+
+\textbf{Estimation Error:} $h^*(x) - g(x)$
+
+$h^*(x)$ is the best approximation of $f \in \mathcal{H}$. $g$ is the function that is actually chosen. The estimation error measures the difference between the two. 
+
+\textbf{Misspecification Error:} $f(x) - h^*(x)$
+
+Misspecification error measures how well you picked you model, or how well you picked the candidate functions. Are there any features that were left out or are not needed.
+
+\textbf{Error due to ignorance:} $t(z) - f(x)$
+
+How far off is our best possible estimate of reality $f(x)$ from actual reality $t(z)$
+
 \intermediatesubproblem{For each of the three source of error, provide a means of reducing the error. We discussed this in class.}\spc{4}
 
+\textbf{Estimation Error:} $h^*(x) - g(x)$
+
+Increase the number of samples.
+
+\textbf{Misspecification Error:} $f(x) - h^*(x)$
+
+Develop a better algorithm, or have a better $\mathcal{H}$ that has an $h^*$ as close as possible to $f$
+
+\textbf{Error due to ignorance:} $t(z) - f(x)$
+
+Expand our attributes, $\vec{X}$
 
 \easysubproblem{Regardless of your answer to what $\mathcal{Y}$ was above, we now coerce $\mathcal{Y} = \braces{0,1}$. If we use a threshold model, what would $\mathcal{H}$ be? What would the parameter(s) be?}\spc{3}
+
+$\mathcal{H} = \{ \mathds{1}_x > x_t : x_t \in \mathbb{R} \} $
 
 
 \easysubproblem{Give an explicit example of $g$ under the threshold model.}\spc{3}
 
-\end{enumerate}
+\begin{equation*}
+\mathds{1}_x = \begin{cases}
+1 \text{ if x >= 150 }\\
+0 \text{ otherwise }
+\end{cases}
+
+\end{equation*}
 
 \problem{These are questions about the linear perceptron. This problem is not related to problem 3.}
 
@@ -152,8 +257,15 @@ NAME: \line(1,0){380}
 
 \easysubproblem{For the linear perceptron model and the linear support vector machine model, what is $\mathcal{H}$? Use $b$ as the bias term.}\spc{3}
 
+$\mathcal{H} = \{ \mathds{1} \vec{w} \cdot \vec{x} > 0 : \vec{w} \in \mathbb{R}^{p+1} \} $
+
 \intermediatesubproblem{Rewrite the steps of the \emph{perceptron learning algorithm} using $b$ as the bias term.}\spc{13}
 
+1. Initialize $\vec{w}$ to 0\\
+2. Calculate $\hat{y}_i = 1 \text{ if } \vec{w} \cdot \vec{x} > 0. \text{ Otherwise it is 0.}$\\
+3. Update the weights $\vec{w}_j = \vec{w}_j + (y_i - \hat{y})* \vec{x}j$ \\
+4. Repeat steps 2 and 3 for all $i \in \{1,..., n\} $
+5. Repeat steps 2 through 4 until a treshold error is reached or until a maximum number of iterations.
 \easysubproblem{Illustrate the perceptron as a one-layer neural network with the Heaviside / binary step / indicator function activation function.}\spc{10}
 
 \easysubproblem{Provide an illustration of a two-layer neural network. Be careful to indicate all pieces. If a mathematical object has a different value from another mathematical object, denote it differently.}\spc{10}
