@@ -254,7 +254,7 @@ Using the algorithm $\mathcal{A}$ discussed previously, this model was dubbed th
 We spoke about how the `w` vector is in a large space, $R^p$. A course in optimization will describe methods how to find optimal and approximately optimal solutions for `w` based on an "objective function" or "fitness function" or "cost function". Here that target is the number of total errors of the `n` examples in the training data set.
 
 ```{r}
-SAE = function(w_vec){
+SAE = function(wb_vec){
   yhat = ifelse(X1 %*% w_vec > 0, 1, 0)
   sum(y_binary != yhat)
 }

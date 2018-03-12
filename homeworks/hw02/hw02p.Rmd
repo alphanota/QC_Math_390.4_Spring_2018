@@ -1,6 +1,6 @@
 ---
 title: "HW02p"
-author: "[Your Name Goes Here]"
+author: "[Angel Montero]"
 date: "March 6, 2018"
 output: pdf_document
 ---
@@ -39,6 +39,7 @@ y_binary = as.numeric(Xy_simple$response == 1)
 
 Try your best to write a general perceptron learning algorithm to the following `Roxygen` spec. For inspiration, see the one I wrote in lecture 6.
 
+
 ```{r}
 #' This function implements the "perceptron learning algorithm" of Frank Rosenblatt (1957).
 #'
@@ -46,10 +47,28 @@ Try your best to write a general perceptron learning algorithm to the following 
 #' @param y_binary    The training data responses as a vector of length n consisting of only 0's and 1's.
 #' @param MAX_ITER    The maximum number of iterations the perceptron algorithm performs. Defaults to 1000.
 #' @param w           A vector of length p + 1 specifying the parameter (weight) starting point. Default is 
-#'                    \code{NULL} which means the function employs random standard uniform values.
+#'                    NULL which means the function employs random standard uniform values.
 #' @return            The computed final parameter (weight) as a vector of length p + 1
-perceptron_learning_algorithm = function(Xinput, y_binary, MAX_ITER = 1000, w = NULL){
+perceptron_learning_algorithm = function(Xinput, y_binary, MAX_ITER = 10, w = NULL){
   #TO-DO
+  
+  if (is.null(w)){
+    w = runif(ncol(Xinput)) #intialize a p+1-dim vector with random values  
+  }  
+  for (i in 1:MAX_ITER) {
+    for (d in 1:nrow(Xinput)) {
+      x_hat = Xinput[d,]
+      
+      y_hat = ifelse(x_hat %*% w > 0, 1, 0)
+      
+      diff = as.numeric(y_binary[d] - y_hat)
+      
+      delta_w = diff * x_hat
+      
+      w = w + delta_w
+    }
+  }
+  w
 }
 ```
 
@@ -77,14 +96,14 @@ simple_viz_obj + simple_perceptron_line
 
 Why is this line of separation not "satisfying" to you?
 
-TO-DO
+It its not directly in the middle of the 0's and 1's.
 
 
 
 2. Use the `e1071` package to fit an SVM model to `y_binary` using the predictors found in `X_simple_feature_matrix`. Do not specify the $\lambda$ (i.e. do not specify the `cost` argument).
 
 ```{r}
-svm_model = #TO-DO
+svm_model = svm(X_simple_feature_matrix, y_binary, kernel = "linear", scale = FALSE)
 ```
 
 and then use the following code to visualize the line in purple:
@@ -101,7 +120,24 @@ simple_svm_line = geom_abline(
 simple_viz_obj + simple_perceptron_line + simple_svm_line
 ```
 
+
+```{r}
+parabola = function(x) {
+  x^2 + 15
+}
+```
+
+```{r}
+pacman::p_load(neldermead)
+?optim
+optim_output = optim(c(2), parabola)
+optim_output
+w_vec = optim_output$par
+```
+
 Is this SVM line a better fit than the perceptron?
+
+No is is a worst fit than the perceptron.
 
 TO-DO
 
@@ -110,6 +146,38 @@ TO-DO
 Note there are differences between this spec and the perceptron learning algorithm spec in question \#1. You should figure out a way to respect the `MAX_ITER` argument value. 
 
 For extra credit, write the actual code.
+
+
+```{r}
+getMax = function(a,b){
+  max(a,b)
+}
+SEA = function(wb_vec,x_vec, y_binar, lambda = 0.1) {
+  w_vec = tail(wb_vec,-1)
+  b = head(wb_vec,1)[1]
+  t = 1 - y_binar * (x_vec %*% w_vec - b)
+  maxes = sapply(t, getMax, b=0)
+  mean(maxes) #+ (lambda * (w_vec%*%w_vec))
+}
+
+DUAL = function(a,x_vec, y_binar) {
+  accumulator = 0;
+  for( i in 1:length(a)) {
+    for (j in i: length(a)) {
+      term = (a[i]*a[j])*(y_binar[i]%*%y_binar[j])*(x_vec[i]%*%x_vec[j])
+      accumulator = accumulator + term
+    }
+  }
+  
+  sum(a) - (0.5 * accumulator)
+}
+```
+
+```{r}
+a = rep(0,nrow(X_simple_feature_matrix))
+opt = optim(a,DUAL, y_binar = y_binary, x_vec = X_simple_feature_matrix,)#sap = SEA(w_vec,b)
+opt
+```
 
 ```{r}
 #' This function implements the hinge-loss + maximum margin linear support vector machine algorithm of Vladimir Vapnik (1963).
@@ -122,6 +190,27 @@ For extra credit, write the actual code.
 #' @return            The computed final parameter (weight) as a vector of length p + 1
 linear_svm_learning_algorithm = function(Xinput, y_binary, MAX_ITER = 5000, lambda = 0.1){
   #TO-DO
+  #control=list(fnscale=-1)
+  #w_vec = rep(0,ncol(Xinput) + 1)
+  a_vec = rep(0,nrow(Xinput))
+  #optimal_SEA = optim(w_vec,SEA, y_binar = y_binary, x_vec = Xinput, lambda = 0.1)
+  optimal = optim(a_vec,DUAL, y_binar = y_binary, x_vec = Xinput)
+  a_vecs = optimal$par
+  print(a_vecs)
+  a_support_indices = which(a_vecs > 0) #get support vectors
+  
+  mat = cbind(Xinput,y_binary,a_vecs)
+  S = mat[a_support_indices,]
+  bias = numeric(nrow(S))
+  for (i in 1:length(bias)) {
+    print(S[i,1:2])
+    bias[i] = S[i,3] - sum( S[,3] * S[,4] * (S[,1:2] %*% S[i,1:2]) )
+  }
+  
+  b = mean(bias)
+  print (b)
+  w_vec = c(b,colSums(a_vecs * y_binary * Xinput))
+  w_vec
 }
 ```
 
@@ -130,7 +219,7 @@ If you wrote code (the extra credit), run your function using the defaults and p
 ```{r}
 svm_model_weights = linear_svm_learning_algorithm(X_simple_feature_matrix, y_binary)
 my_svm_line = geom_abline(
-    intercept = svm_model_weights[1] / svm_model_weights[3],#NOTE: negative sign removed from intercept argument here
+    intercept = -svm_model_weights[1] / svm_model_weights[3],#NOTE: negative sign removed from intercept argument here
     slope = -svm_model_weights[2] / svm_model_weights[3], 
     color = "brown")
 simple_viz_obj  + my_svm_line
@@ -149,6 +238,16 @@ Is this the same as what the `e1071` implementation returned? Why or why not?
 #' @return            The predictions as a n* length vector.
 nn_algorithm_predict = function(Xinput, y_binary, Xtest){
   #TO-DO
+  max_dist = Inf
+  best_index = 0;
+  for (i in 1:nrow(Xinput)) {
+    test_dist = (Xinput[i,]-Xtest) %*% (Xinput[i,]-Xtest)
+    if (test_dist < max_dist){
+      max_dist = test_dist
+      best_index = i
+    }
+  }
+  y_binary[best_index]
 }
 ```
 
@@ -156,18 +255,91 @@ Write a few tests to ensure it actually works:
 
 ```{r}
 #TO-DO
+library('testthat')
+expect_equal(nn_algorithm_predict(Xinput = X_simple_feature_matrix, y_binary = y_binary, Xtest = c(4,3)), 1)
+expect_equal(nn_algorithm_predict(Xinput = X_simple_feature_matrix, y_binary = y_binary, Xtest = c(3,3)), 1)
+expect_equal(nn_algorithm_predict(Xinput = X_simple_feature_matrix, y_binary = y_binary, Xtest = c(3,4)), 1)
+
+expect_equal(nn_algorithm_predict(Xinput = X_simple_feature_matrix, y_binary = y_binary, Xtest = c(1,1)), 0)
+expect_equal(nn_algorithm_predict(Xinput = X_simple_feature_matrix, y_binary = y_binary, Xtest = c(1,2)), 0)
+expect_equal(nn_algorithm_predict(Xinput = X_simple_feature_matrix, y_binary = y_binary, Xtest = c(2,1)), 0)
+
+expect_equal(nn_algorithm_predict(Xinput = X_simple_feature_matrix, y_binary = y_binary, Xtest = c(3.5,3.5)), 1)
+
+expect_equal(nn_algorithm_predict(Xinput = X_simple_feature_matrix, y_binary = y_binary, Xtest = c(5,5)), 1)
+
+expect_equal(nn_algorithm_predict(Xinput = X_simple_feature_matrix, y_binary = y_binary, Xtest = c(2.5,1.5)), 0)
+
+
 ```
 
 For extra credit, add an argument `k` to the `nn_algorithm_predict` function and update the implementation so it performs KNN. In the case of a tie, choose $\hat{y}$ randomly. Set the default `k` to be the square root of the size of $\mathcal{D}$ which is an empirical rule-of-thumb popularized by the "Pattern Classification" book by Duda, Hart and Stork (2007). Also, alter the documentation in the appropriate places.
 
 ```{r}
 #not required TO-DO --- only for extra credit
+
+
+
+nn_algorithm_predict = function(Xinput, y_binary, Xtest, k = 1){
+  #TO-DO
+  max_dist = Inf
+  best_index = 0;
+  dist_ary = as.numeric(nrow(Xinput))
+  for (i in 1:nrow(Xinput)) {
+    test_dist = (Xinput[i,]-Xtest) %*% (Xinput[i,]-Xtest)
+    dist_ary[i] = test_dist
+  }
+  
+  dist_ary_ind = order(dist_ary)
+  
+  chosen_indices = dist_ary_ind[1:k]
+  chosen_y = y_binary[chosen_indices]
+  binchoose = mean(chosen_y)
+  final = ifelse( binchoose == 0.05, rbinom(1,1,0.5), round(binchoose) )
+  final
+}
+
+#TO-DO
+library('testthat')
+expect_equal(nn_algorithm_predict(Xinput = X_simple_feature_matrix, y_binary = y_binary, Xtest = c(4,3)), 1)
+
+expect_equal(nn_algorithm_predict(Xinput = X_simple_feature_matrix, y_binary = y_binary, Xtest = c(4,3), k = 6), 0)
+
+expect_equal(nn_algorithm_predict(Xinput = X_simple_feature_matrix, y_binary = y_binary, Xtest = c(4,2), k=4), 1)
+
+
+
 ```
+
 
 For extra credit, in addition to the argument `k`, add an argument `d` representing any legal distance function to the `nn_algorithm_predict` function. Update the implementation so it performs KNN using that distance function. Set the default function to be the Euclidean distance in the original function. Also, alter the documentation in the appropriate places.
 
 ```{r}
-#not required TO-DO --- only for extra credit
+euclid = function(u,v) {
+  sum((u-v)^2)
+}
+
+nn_algorithm_predict = function(Xinput, y_binary, Xtest, k = 1, d= euclid){
+  #TO-DO
+  max_dist = Inf
+  best_index = 0;
+  dist_ary = as.numeric(nrow(Xinput))
+  for (i in 1:nrow(Xinput)) {
+    test_dist = d(Xinput[i,],Xtest)
+    dist_ary[i] = test_dist
+  }
+  
+  dist_ary_ind = order(dist_ary)
+  
+  chosen_indices = dist_ary_ind[1:k]
+  chosen_y = y_binary[chosen_indices]
+  binchoose = mean(chosen_y)
+  final = ifelse( binchoose == 0.05, rbinom(1,1,0.5), round(binchoose) )
+  final
+}
+
+expect_equal(nn_algorithm_predict(Xinput = X_simple_feature_matrix, y_binary = y_binary, Xtest = c(4,2), k=4), 1)
+
 ```
 
 
@@ -187,12 +359,24 @@ Solve for the least squares line by computing $b_0$ and $b_1$ _without_ using th
 
 ```{r}
 #TO-DO
+
+SSE = function(B,X,Y) {
+  sum((B[1] + (B[2] * X) - Y)^2)
+}
+Bs = c(1,1)
+
+Bs = optim(par=Bs,SSE, X=x, Y=y )$par
+
+b_0 = Bs[1]
+b_1 = Bs[2]
+
+Bs
 ```
 
 Verify your computations are correct using the `lm` function in R:
 
 ```{r}
-lm_mod = #TO-DO
+lm_mod = lm( y ~ x)
 b_vec = coef(lm_mod)
 expect_equal(b_0, as.numeric(b_vec[1]), tol = 1e-4) #thanks to Rachel for spotting this bug - the b_vec must be casted to numeric
 expect_equal(b_1, as.numeric(b_vec[2]), tol = 1e-4)
@@ -201,27 +385,28 @@ expect_equal(b_1, as.numeric(b_vec[2]), tol = 1e-4)
 6. We are now going to repeat one of the first linear model building exercises in history --- that of Sir Francis Galton in 1886. First load up package `HistData`.
 
 ```{r}
-#TO-DO
+library('HistData')
 ```
 
 In it, there is a dataset called `Galton`. Load it using the `data` command:
 
 ```{r}
-#TO-DO
+data('Galton')
 ```
 
 You now should have a data frame in your workspace called `Galton`. Summarize this data frame and write a few sentences about what you see. Make sure you report $n$, $p$ and a bit about what the columns represent and how the data was measured. See the help file `?Galton`.
 
 ```{r}
 #TO-DO
+
 ```
 
-TO-DO
+The dataset is a survey of the average height of parents plotted against the height of their child. The independent variable is average parent height while the dependent variable is the height of the child. n = 928 (children) and p = 2.
 
 Find the average height (include both parents and children in this computation).
 
 ```{r}
-avg_height = #TO-DO
+avg_height = mean(unlist(Galton))
 ```
 
 Note that in Math 241 you learned that the sample average is an estimate of the "mean", the population expected value of height. We will call the average the "mean" going forward since it is probably correct to the nearest tenth of an inch with this amount of data.
@@ -230,6 +415,26 @@ Run a linear model attempting to explain the childrens' height using the parents
 
 ```{r}
 #TO-DO
+
+model = lm ( child ~ parent, data= Galton)
+bvals = coef(model)
+b_0 = bvals[1]
+b_1 = bvals[2]
+
+yhat = b_0 + b_1 * x #this is the g(x^*) function!
+e = y - yhat
+sse = sum(e^2)
+mse = sse / length(y)
+rmse = sqrt(mse)
+sse
+mse
+rmse
+
+s_sq_y = var(y)
+s_sq_e = var(e)
+rsq = (s_sq_y - s_sq_e) / s_sq_y
+rsq
+
 ```
 
 Interpret all four quantities: $b_0$, $b_1$, RMSE and $R^2$.
@@ -243,16 +448,18 @@ TO-DO
 Now use the code from practice lecture 8 to plot the data and a best fit line using package `ggplot2`. Don't forget to load the library.
 
 ```{r}
-#TO-DO
+simple_viz_obj = ggplot(Galton, aes(x = Galton$parent, y = Galton$child)) + geom_point()
+simple_ls_regression_line = geom_abline(intercept = bvals[1], slope = bvals[2], color = "red")
+simple_viz_obj + simple_ls_regression_line
 ```
 
 It is reasonable to assume that parents and their children have the same height. Explain why this is reasonable using basic biology.
 
-TO-DO
+Height is a genetic trait which is is information passed from parent to child via the inheritance of genes.
 
 If they were to have the same height and any differences were just random noise with expectation 0, what would the values of $\beta_0$ and $\beta_1$ be?
 
-TO-DO
+$\beta_0 = 1$ and $\beta_1 = 1$
 
 Let's plot (a) the data in $\mathbb{D}$ as black dots, (b) your least squares line defined by $b_0$ and $b_1$ in blue, (c) the theoretical line $\beta_0$ and $\beta_1$ if the parent-child height equality held in red and (d) the mean height in green.
 
@@ -270,17 +477,22 @@ ggplot(Galton, aes(x = parent, y = child)) +
 
 Fill in the following sentence: 
 
-TO-DO: Children of short parents became ... on average and children of tall parents became ... on average.
+TO-DO: Children of short parents became [taller] on average and children of tall parents became [shorter] on average.
 
 Why did Galton call it "Regression towards mediocrity in hereditary stature" which was later shortened to "regression to the mean"?
 
-TO-DO
+The height lies on a distribution with a mean, a child is more likely to have a height closer to the mean than one farther form it.
 
 Why should this effect be real?
 
-TO-DO
+If it weren't real we would have a runaway effect where tall parents gave birth to taller children and short parents to shorter children, over the generations, we would have a population of giants and dwarfs, but this is not the case obviously.
+
 
 You now have unlocked the mystery. Why is it that when modeling with $y$ continuous, everyone calls it "regression"? Write a better, more descriptive and appropriate name for building predictive models with $y$ continuous.
 
-TO-DO
+To generate the model line, we first picked the true Betas $B_0$ and $B_1$ and then added random noise to generate points that lie close to but not exactly on the line.
+
+Regression reverses this process, the purpose is to squish or regress the points (or regress through time) back to the mean value that lies on the line.
+
+
 
