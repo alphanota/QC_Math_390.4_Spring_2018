@@ -13,6 +13,7 @@ knitr::opts_chunk$set(error = TRUE) #this allows errors to be printed into the P
 
 ```{r}
 #TO-DO
+library('ggplot2')
 ```
 
 The dataset `diamonds` is in the namespace now as it was loaded with the `ggplot2` package. Run the following code and write about the dataset below.
@@ -27,6 +28,9 @@ diamonds$clarity = factor(as.character(diamonds$clarity))
 
 What is $n$, $p$, what do the features mean, what is the most likely response metric and why?
 
+$n$ = 53940, and $p$ = 10.
+
+ANSWER: The features are special aesthetic and physical properties of the diamonds that may have an effect on the size. For example, the carat corresponds to the size of the diamond.
 ***TO-DO
 
 Regardless of what you wrote above, the variable `price` will be the response variable going forward. 
@@ -35,12 +39,38 @@ Use `ggplot` to look at the univariate distributions of *all* predictors. Make s
 
 ```{r}
 #TO-DO
+
+
+for (col in colnames(diamonds)) {
+  base = ggplot(diamonds, aes_string(col))
+  if(is.factor(diamonds[[col]]) ){
+    print ('TRUE')
+    print (base + geom_bar())
+  }
+  else{
+    print(base + geom_density())
+  }
+}
+
+
+
 ```
 
 Use `ggplot` to look at the bivariate distributions of the response versus *all* predictors. Make sure you handle categorical predictors differently from continuous predictors. This time employ a for loop when an logic that handles the predictor type.
 
 ```{r}
 #TO-DO
+for (col in colnames(diamonds)) {
+  base = ggplot(diamonds, aes_string(col))
+  if(is.factor(diamonds[[col]]) ){
+    print ('TRUE')
+    print (base + geom_boxplot(aes(y=price)))
+  }
+  else{
+    print(base + geom_point(aes(y=price)))
+  }
+}
+
 ```
 
 Does depth appear to be mostly independent of price?
@@ -51,15 +81,25 @@ Look at depth vs price by predictors cut (using faceting) and color (via differe
 
 ```{r}
 #TO-DO
+ggplot(diamonds) +
+  geom_point(aes(x=cut,y=color))
+
+lm(color ~ cut, diamonds)
 ```
 
 
 Does diamond color appear to be independent of diamond depth?
 
 **TO-DO
-
+```{r}
+ggplot(diamonds) +
+  geom_point(aes(x=depth,y=color))
+```
 Does diamond cut appear to be independent of diamond depth?
-
+```{r}
+ggplot(diamonds) +
+  geom_point(aes(x=cut,y=depth))
+```
 **TO-DO
 
 Do these plots allow you to assess well if diamond cut is independent of diamond price? Yes / no
@@ -70,16 +110,24 @@ We never discussed in class bivariate plotting if both variables were categorica
 
 ```{r}
 #TO-DO
+obj = ggplot(diamonds, aes(x = color, y = clarity, color = price)) +
+  geom_point(size=0.01) +
+  geom_jitter(width=0.1,height=0.1)+
+  labs(x = "Diamond Color", y = "uniformity of cell size") + 
+  ggtitle("Breast Cancer Malignancy", subtitle = "by two tumor characteristics")
+
+obj
+
 ```
 
 Does diamond clarity appear to be mostly independent of diamond color?
 
-**TO-DO
+Yes.
 
 2. Use `lm` to run a least squares linear regression using depth to explain price. 
 
 ```{r}
-#TO-DO
+mod = lm( price ~ depth, diamonds)
 ```
 
 What is $b$, $R^2$ and the RMSE? What was the standard error of price originally? 
@@ -87,22 +135,31 @@ What is $b$, $R^2$ and the RMSE? What was the standard error of price originally
 
 ```{r}
 #TO-DO
+coef(mod)
+summary(mod)$r.squared
+summary(mod)$sigma
 ```
 
 Are these metrics expected given the appropriate or relevant visualization(s) above?
 
 **TO-DO
 
+Depth alone appears to have a very poor predictor for price. 
+
 Use `lm` to run a least squares linear regression using carat to explain price. 
 
 ```{r}
 #TO-DO
+mod1 = lm( price ~ carat, diamonds)
 ```
 
 What is $b$, $R^2$ and the RMSE? What was the standard error of price originally? 
 
 ```{r}
 #TO-DO
+coef(mod1)
+summary(mod1)$r.squared
+summary(mod1)$sigma
 ```
 
 Are these metrics expected given the appropriate or relevant visualization(s) above?
