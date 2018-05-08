@@ -3,7 +3,7 @@
 \include{preamble}
 
 \newtoggle{professormode}
-\toggletrue{professormode} %STUDENTS: DELETE or COMMENT this line
+%\toggletrue{professormode} %STUDENTS: DELETE or COMMENT this line
 
 
 
@@ -48,26 +48,52 @@ NAME: \line(1,0){380}
 
 \easysubproblem{What algorithm that we studied in class is PECOTA most similar to?}\spc{1}
 
+PECOTA is most similar to the k-nearest neighbor algorithm we learned in class. PECOTA works by using baseball players various statistical attributes to cluster players that are more similar. The power of PECOTA lies in the fact that it is able to predict the performance of early career players by finding the player in the training set that is most similar to the player.
+
 \easysubproblem{Is baseball performance as a function of age a linear model? Discuss.}\spc{2}
+
+No. One of the points that Nate Silver discusses is that in analyzing the data he used to build PECOTA, he noticed that a player's overall performance peaked between ages 25-30, so the function would better resemble a concave parabola than a straight line
 
 \intermediatesubproblem{How can baseball scouts do better than a prediction system like PECOTA?}\spc{4}
 
+
+
 \intermediatesubproblem{Why hasn't anyone (at the time of the writing of Silver's book) taken advantage of Pitch f/x data to predict future success?}\spc{4}
+
+There is not yet still enough training data from Pitch f/x in order to build an accurate model. Pitch f/x systems started being used around 2006, whereas baseball as a sport is more than a hundred years old. There is much more data available on player's other statistics, such as height, weight, batting averages, home runs, and other variables going back decades than there is Pitch f/x data. As more Pitch f/x dataset increases, it is possible that more accurate models can be built using it.
+
 
 \hardsubproblem{Chapter 4 is all about predicting weather. Broadly speaking, what is the problem with weather predictions? Make sure you use the framework and notation from class. This is not an easy question and we will discuss in class. Do your best.}\spc{6}
 
+"Chaos Theory" is a major underlying cause limiting the accuracy of weather models. Minute changes in the starting state of the models can amplify and cause drastic changes in the final results. Because of this, forecasters have to be very  careful in how they process their data as minute rounding errors can produce different results, in addition even small bugs in the program can cause large divergences in the results
+
 \easysubproblem{Why does the weatherman lie about the chance of rain? And where should you go if you want honest forecasts?}\spc{2}
 
+Weathermen lie about the chance of rain, because the audience get upset when it rains when forecasts call for no precipitation, which might result in loss of viewership. False negatives are more expensive than false positives (people are not as upset if it didn’t rain when forecasts said it would) therefore in order to minimize their risk, TV forecasters tend to adjust their models to err on the side of false positive rather than false negatives. Institutions like the national weather service are more interested in more empirical, non-consumer oriented weather prediction, so they are a better source of accurate weather forecasts.
+
 \hardsubproblem{Chapter 5 is all about predicting earthquakes. Broadly speaking, what is the problem with earthquake predictions? It is \textit{not} the same as the problem of predicting weather. Read page 162 a few times. Make sure you use the framework and notation from class.}\spc{6}
+
+Unlike weather, what causes earthquakes is still a mystery. This is because earthquakes happen deep underground away from scientist's prying eyes, making them harder to study. The error due to ignorance is very large because we still don't have a good set of X's that  explain earthquakes.
+
 
 \easysubproblem{Silver has quite a whimsical explanation of overfitting on page 163 but it is really educational! What is the nonsense predictor in the model he describes?}\spc{2}
 
 
+Characteristic fit, nonsense predictor pg 163
+
 \easysubproblem{John von Neumann was credited with saying that \qu{with four parameters I can fit an elephant and with five I can make him wiggle his trunk}. What did he mean by that and what is the message to you, the budding data scientist? }\spc{5}
+
+It is a message about overfitting. Even though using more predictors can make more detailed fits, and with 5 variables we can fit the elephant down to the shape of his trunk, the next elephant we look at might be wriggling their trunk differently. Is how an elephant wriggles their trunk part of what makes an elephant an elephant anyway? It is likely that the essence of an elephant can be described in   other terms and fitting the elephant's wriggle would be like fitting the noise in the data.
+
 
 \hardsubproblem{Chapter 6 is all about predicting unemployment, an index of macroeconomic performance of a country. Broadly speaking, what is the problem with unemployment predictions? It is \textit{not} the same as the problem of predicting weather or earthquakes. Make sure you use the framework and notation from class.}\spc{6}
 
+There is inherent economic biases in predicting the economy. Economists are pressured in making definitive point-predictions and probabilistic predictions are few and far-between.
+
+
 \extracreditsubproblem{Many times in this chapter Silver says something on the order of \qu{you need to have theories about how things function in order to make good predictions.} Do you agree? Discuss.}\spc{4}
+
+I agree. Being familiar with the system you are trying to model will allow you to build better models. A person with domain knowledge about the system they are trying to model will have better knowledge about the underlying causes that govern the system, and will therefore be better able to be selective and pick appropiate set of Xs. A layman with little or no domain knowledge might either miss one crucial predictor that would be immediately be immediately recognized by an expert, or be nondescriminate and incorporate many Xs into their model and therefore be in danger of overfitting, fitting the noise, and mistaking correlation where there is none.
 
 
 \end{enumerate}
@@ -80,7 +106,22 @@ NAME: \line(1,0){380}
 
 \easysubproblem{For one fixed $\mathcal{H}$ and $\mathcal{A}$ (i.e. one model), write below the steps to do a simple validation and include the final step which is shipping the final $g$.}\spc{6}
 
+K = how to split the training data
+D = original test data
+FUNCTION SimpleValidate(D, K):
+  Split D into Dtrain and Dtest
+  compute g = A(H,D)
+  compute sse(g,Dtest)
+  return g
+
 \easysubproblem{For one fixed $\mathcal{H}$ and $\mathcal{A}$ (i.e. one model), write below the steps to do a $K$-fold cross validation and include the final step which is shipping the final $g$.}\spc{10}
+
+K = # of folds of data
+D = original test data
+
+function SimpleCrossValidate:
+  Let D1, D2.. Dk 
+
 
 \intermediatesubproblem{For one fixed $\mathcal{H}$ and $\mathcal{A}$ (i.e. one model), write below the steps to do a bootstrap validation and include the final step which is shipping the final $g$.}\spc{10}
 
