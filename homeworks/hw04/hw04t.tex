@@ -56,6 +56,7 @@ No. One of the points that Nate Silver discusses is that in analyzing the data h
 
 \intermediatesubproblem{How can baseball scouts do better than a prediction system like PECOTA?}\spc{4}
 
+Baseball scouts have a larger selection of Xs. They have better access to early career players and are able to use non-quantifiable characteristics of the player's performance. For example, one of the things Nate Silver says scouts like to look for is how disciplined the player is during training. For example, Pedroia, who was forecasted to be a good performer, tended to be very focused during practices, to the point of blowing off Silver's questions because he didn't want to lose focus on the game. Scouts also can measure more detailed data like the player's speed, agility, and speed of their pitches which is information not available to PECOTA.
 
 
 \intermediatesubproblem{Why hasn't anyone (at the time of the writing of Silver's book) taken advantage of Pitch f/x data to predict future success?}\spc{4}
@@ -106,29 +107,109 @@ I agree. Being familiar with the system you are trying to model will allow you t
 
 \easysubproblem{For one fixed $\mathcal{H}$ and $\mathcal{A}$ (i.e. one model), write below the steps to do a simple validation and include the final step which is shipping the final $g$.}\spc{6}
 
-K = how to split the training data
-D = original test data
-FUNCTION SimpleValidate(D, K):
-  Split D into Dtrain and Dtest
-  compute g = A(H,D)
-  compute sse(g,Dtest)
-  return g
+Inputs:\\
+$\mathcal{H}$\\
+$\mathcal{A}$\\
+$\mathcal{D}$\\
+$p$ : size of the split as a pecent value (ie 80)\\
+function simpleValidate($\mathcal{H}$, $\mathcal{A}$, $\mathcal{D}$, $p$) :\\
+let $\mathcal{D}\textsubscript{train}$ = A subset of $\mathcal{D}$ such that it contains p percent of $\mathcal{D}$\\
+let $\mathcal{D}\textsubscript{test}$ = the remaining 1-p percent of $\mathcal{D}$\\
+fit $g$ = $\mathcal{A}(H,D\textsubscript{train})$\\
+test $g$ using $\mathcal{D}\textsubscript{test}$\\
+return $g$\\
+
 
 \easysubproblem{For one fixed $\mathcal{H}$ and $\mathcal{A}$ (i.e. one model), write below the steps to do a $K$-fold cross validation and include the final step which is shipping the final $g$.}\spc{10}
 
-K = # of folds of data
-D = original test data
 
-function SimpleCrossValidate:
-  Let D1, D2.. Dk 
+Inputs:\\
+$\mathcal{H}$\\
+$\mathcal{A}$\\
+$\mathcal{D}$\\
+$K$ : number of folds of $\mathcal{D}$\\
+function simpleCrossValidate($\mathcal{H}$, $\mathcal{A}$, $\mathcal{D}$, $K$) :\\
+  1: partition $\mathcal{D}$ into $K$ pieces, labeled $\mathcal{D}_1, {D}_2 ... {D}_K$\\
+  2: let $\mathcal{G}$ = []\\
+  3: let $cost$ = 0\\
+  4: let $k = 1$\\
+  5: $\mathcal{D}\textsubscript{test} = $\mathcal{D}_k$\\
+  6: $\mathcal{D}\textsubscript{train}$ = all $\mathcal{D}_1 , {D}_2 , ... ,{D}_K $ except $\mathcal{D}_k$\\
+  7: fit $g_k$ = $\mathcal{A}(H,D\textsubscript{train})$\\
+  8: test $g_k$ using $\mathcal{D}\textsubscript{test}$\\
+  9: add test cost to $cost$\\
+  10: add $g_k$ to $\mathcal{G}$\\
+  11: increment $k$ by 1\\
+  12: repeat steps 5-11 until $k > K$\\
+  13: $g\textsubscript{final}$ = average of all $g's$ in $\mathcal{G}$\\
+  14: return $g\textsubscript{final}$\\
 
 
 \intermediatesubproblem{For one fixed $\mathcal{H}$ and $\mathcal{A}$ (i.e. one model), write below the steps to do a bootstrap validation and include the final step which is shipping the final $g$.}\spc{10}
 
+Inputs:\\
+$\mathcal{H}$\\
+$\mathcal{A}$\\
+$\mathcal{D}$ with dimension n x (p+1)\\
+
+function simpleBootstrapValidate($\mathcal{H}$, $\mathcal{A}$, $\mathcal{D}$) :\\
+  1: let $\mathcal{D}\textsubscript{train}$ = a random sample with replacement of  $\mathcal{D}$ (with size n)\\
+  2: let $\mathcal{D}\textsubscript{test}$ = the remaining samples in $\mathcal{D}$ not in $\mathcal{D}\textsubscript{train}$\\
+  3: fit $g$ = $\mathcal{A}(H,D\textsubscript{train})$\\
+  4: test $g$ using $\mathcal{D}\textsubscript{test}$\\
+  5: return $g$\\
+
+
 \intermediatesubproblem{For one fixed $\mathcal{H}_1, \ldots \mathcal{H}_M$ and $\mathcal{A}$ (i.e. $M$ different models), write below the steps to do a simple validation and include the final step which is shipping the final $g$.}\spc{22}
+
+Inputs:\\
+$\mathcal{H}$ (multiple H's)\\ 
+$\mathcal{A}$\\
+$\mathcal{D}$\\
+
+$p$ : size of the split as a pecent value (ie 80)\\
+function simpleValidate($\mathcal{H}$, $\mathcal{A}$, $\mathcal{D}$, $p$) :\\
+1: let $min\_cost = 100$\\
+2: let $g\textsubscript{final}$ = []\\
+3: let $i = 1$\\
+4: let $\mathcal{D}\textsubscript{train}$ = A subset of $\mathcal{D}$ such that it contains p percent of $\mathcal{D}$\\
+5: let $\mathcal{D}\textsubscript{test}$ = the remaining 1-p percent of $\mathcal{D}$\\
+6: fit $g$ = $\mathcal{A}(H_i,D\textsubscript{train})$\\
+7: let $cost$ = test of $g$ using $\mathcal{D}\textsubscript{test}$\\
+8: if $cost < min\_cost$: $min\_cost = cost$, $g\textsubscript{final} = g$\\
+9: increment $i$ by 1\\
+10: repeat steps 4-9 until $i > M$\\
+11: return $g\textsubscript{final}\\
 
 \hardsubproblem{For one fixed $\mathcal{H}_1, \ldots \mathcal{H}_M$ and $\mathcal{A}$ (i.e. $M$ different models), write below the steps to do a $K$-fold cross validation and include the final step which is shipping the final $g$. This is not an easy problem! There are a lot of steps and a lot to keep track of...}\spc{22}
 
+Inputs:\\
+$\mathcal{H}$\\
+$\mathcal{A}$\\
+$\mathcal{D}$\\
+$K$ : number of folds of $\mathcal{D}$\\
+function ComplexCrossValidate($\mathcal{H}$, $\mathcal{A}$, $\mathcal{D}$, $K$) :\\
+  1: let $min\_cost = 100$\\
+  2: let $g\textsubscript{final}$ = []\\
+  3: let $i = 1$ (iterating through all the models)\\
+  4: partition $\mathcal{D}$ into $K$ pieces, labeled $\mathcal{D}_1, {D}_2 ... {D}_K$\\
+  5: let $\mathcal{G}$ = []\\
+  6: let $avg\_cost$ = 0\\
+  7: let $k = 1$ (iterate through folds)\\
+  8: $\mathcal{D}\textsubscript{test} = $\mathcal{D}_k$\\
+  9: $\mathcal{D}\textsubscript{train}$ = all $\mathcal{D}_1 , {D}_2 , ... ,{D}_K $ except $\mathcal{D}_k$\\
+  10: fit $g_k$ = $\mathcal{A}(H_i,D\textsubscript{train})$\\
+  11: $cost$ = test $g_k$ using $\mathcal{D}\textsubscript{test}$\\
+  12: add $cost$ to $avg\_cost$\\
+  13: add $g_k$ to $\mathcal{G}$\\
+  14: increment $k$ by 1\\
+  15: repeat steps 5-11 until $k > K$\\
+  16: compute $cost\_avg$ = $cost\_avg / K$\\
+  17: $g\textsubscript{final}$ = average of all $g's$ in $\mathcal{G}$\\
+  18: if $avg\_cost < min\_cost$: $min\_cost = avg\_cost$, $g\textsubscript{final} = g$\\
+  19: increment $i$ by 1\\
+  20: repeat steps 5-11 until $i > M$\\
+  21: return $g\textsubscript{final}$\\
 
 \end{enumerate}
 
@@ -140,18 +221,44 @@ function SimpleCrossValidate:
 
 \intermediatesubproblem{Imagine we are in the \qu{Luis situation} where we have $\X$ with dimension $n \times (p+1)$ but $p+1 > n$ and we still want to do OLS. Why would the OLS solution we found previously break down in this case?}\spc{4}
 
+In order to do OLS what we do is find the orthogonal projection of $\Y$ onto the columnspace of $\X$
+we use the $\hat{H}$ matrix,  $\hat{Y} = \hat{H}{Y} = {X}({X^T}{X})\textsuperscript{-1}{X}^T{Y}$
+
+This is a valid only only if the matrix $({X^T}{X})$ is invertible.
+
+When $\X$ has dimensions $n \times (p+1)$, and $p+1 < n$ it has rank $p+1$ and the square matrix  $({X^T}{X})$ also has rank $p+1$ and dimension $p+1 \times p+1$
+and therefore invertible.
+
+When $p+1 > n$, the dimension is $p+1 \times p+1$ but the rank is now n, which is less than $p + 1$. The matrix is not full rank and therefore not invertible, so we cant use the OLS method.
+
+
 \intermediatesubproblem{We will embark now to provide a solution for this case. The solution will also give nice results for other situations besides the Luis situation as well. First, assume $\lambda$ is a positive constant and demonstrate that the expression $\lambda \normsq{\w} = \w^\top (\lambda \I) \w$ i.e. it can be expressed as a quadratic form where $\lambda\I$ is the determining matrix. We will call this term $\lambda \normsq{\w}$ the \qu{ridge penalty}.}\spc{3}
 
+$\lambda \normsq{\w}$\\
+$\lambda  \w^\top \w  $\\
+$\w^\top (\lambda \I) \w$\\
+$\w^\top (\lambda \I) \w$\\
+$\w^\top (\lambda \I) \w$\\
 
 \easysubproblem{Write the $\mathcal{H}$ for OLS below where there parameter is the $\w$ vector. $\w \in$ ?}\spc{1}
 
+
+
 \easysubproblem{Write the error objective function that OLS minimizes using vectors, then expand the terms similar to the previous homework assignment.}\spc{1}
+
+$w = argmin (\y - \X\w)^\top$ (\y - \X\w)
 
 \easysubproblem{Now add the ridge penalty $\lambda \normsq{\w}$ to the expanded form you just found and write it below. We will term this two-part error function the \qu{ridge objective}.}\spc{1}
 
+$w = argmin $(\y - \X\w)^\top (\y - \X\w) +\lambda \normsq{\w}$\\
+
 \easysubproblem{Note that the ridge objective looks a bit like the hinge loss we spoke about when we were learning about support vector machines. There are two pieces of this error function in counterbalance. When this is minimized, describe conceptually what is going on.}\spc{5}
 
+The $\lambda$ constant is added into the hat matrix, it places a lower limit on the orthogonalization of $\y$ in order to prevent overfitting.
+
 \intermediatesubproblem{Now, the ridge penalty term as a quadratic form can be combined with the last term in the least squares error from OLS. Do this, then use the rules of vector derivatives we learned to take $d/d\w$ and write the answer below.}\spc{2}
+
+
 
 \easysubproblem{Now set that derivative equal to zero. What matrix needs to be invertible to solve?}\spc{2}
 
